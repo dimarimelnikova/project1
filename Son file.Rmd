@@ -1,0 +1,14 @@
+---
+title: "pr"
+author: "Sofi Tormasheva"
+date: "04 03 2017"
+output: html_document
+---
+
+Загружаем базу
+```{r}
+library(readr)
+SpeedDating <- read_csv("~/pr3/project1/SpeedDating.csv")
+View(SpeedDating)
+```
+
