@@ -1,14 +1,191 @@
 ---
-title: "pr"
+title: "Матрицы"
 author: "Sofi Tormasheva"
 date: "04 03 2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 Загружаем базу
-```{r}
+```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(readr)
 SpeedDating <- read_csv("~/pr3/project1/SpeedDating.csv")
-View(SpeedDating)
 ```
 
+Матрица для поиска похожих
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(dplyr)
+SD1 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1, mn_sat)
+```
+
+iid - уникальный номер
+age - возраст
+gender - пол
+career_c - закодированная карьерная область
+1= Lawyer
+2= Academic/Research
+3= Psychologist
+4= Doctor/Medicine
+5=Engineer
+6= Creative Arts/Entertainment
+7= Banking/Consulting/Finance/Marketing/Business/CEO/Entrepreneur/Admin
+8= Real Estate
+9= International/Humanitarian Affairs
+10= Undecided
+11=Social Work
+12=Speech Pathology
+13=Politics
+14=Pro sports/Athletics
+15=Other
+16=Journalism
+17=Architecture
+
+Интересы:
+sports: Playing sports/ athletics
+tvsports: Watching sports
+exercise: Body building/exercising
+dining: Dining out
+museums: Museums/galleries
+art: Art
+hiking: Hiking/camping
+gaming: Gaming
+clubbing: Dancing/clubbing
+reading: Reading
+tv: Watching TV
+theater: Theater
+movies: Movies
+concerts: Going to concerts
+music: Music
+shopping: Shopping
+yoga: Yoga/meditation
+
+Личные характеристики:
+attr3_1 Attractive
+sinc3_1 Sincere
+intel3_1 Intelligent
+fun3_1 Fun
+amb3_1 Ambitious
+
+mn_sat - средний балл SAT
+
+Оставляем уникальных людей
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD1un = unique(SD1)
+SD1NA = na.omit(SD1un) #199
+```
+Предложение - исключить параметр mn_sat из-за малого количества данных
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1)
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2un = unique(SD2)
+SD2NA = na.omit(SD2un)#535
+```
+
+535 уникальных человека в базе
+
+База с расширенными личными характеристиками
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22 = select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, zipcode, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22un = unique(SD22)
+SD22NA = na.omit(SD22un)#466
+```
+
+466 уникальных человека с расширенными характеристиками
+
+iid
+gender
+age
+field_cd закодированный field of study
+1= Law
+2= Math
+3= Social Science, Psychologist
+4= Medical Science, Pharmaceuticals, and Bio Tech
+5= Engineering
+6= English/Creative Writing/ Journalism
+7= History/Religion/Philosophy
+8= Business/Econ/Finance
+9= Education, Academia
+10= Biological Sciences/Chemistry/Physics
+11= Social Work
+12= Undergrad/undecided
+13=Political Science/International Affairs
+14=Film
+15=Fine Arts/Arts Administration
+16=Languages
+17=Architecture
+18=Other
+
+race
+Black/African American=1
+European/Caucasian-American=2
+Latino/Hispanic American=3
+Asian/Pacific Islander/Asian-American=4
+Native American=5
+Other=6
+
+imprace:
+How important is it to you (on a scale of 1-10) that a person you date be of the same
+racial/ethnic background?
+imprelig:
+How important is it to you (on a scale of 1-10) that a person you date be of the same
+religious background?
+zipcode:
+What was the zip code of the area where you grew up?
+
+goal:
+What is your primary goal in participating in this event?
+Seemed like a fun night out=1
+To meet new people=2
+To get a date=3
+Looking for a serious relationship=4
+To say I did it=5
+Other=6
+
+date:
+In general, how frequently do you go on dates?
+Several times a week=1
+Twice a week=2
+Once a week=3
+Twice a month=4
+Once a month=5
+Several times a year=6
+Almost never=7
+
+go out:
+How often do you go out (not necessarily on dates)?
+Several times a week=1
+Twice a week=2
+Once a week=3
+Twice a month=4
+Once a month=5
+Several times a year=6
+Almost never=7
+
+career_c: career coded
+1= Lawyer
+2= Academic/Research
+3= Psychologist
+4= Doctor/Medicine
+5=Engineer
+6= Creative Arts/Entertainment
+7= Banking/Consulting/Finance/Marketing/Business/CEO/Entrepreneur/Admin
+8= Real Estate
+9= International/Humanitarian Affairs
+10= Undecided
+11=Social Work
+12=Speech Pathology
+13=Politics
+14=Pro sports/Athletics
+15=Other
+16=Journalism
+17=Architecture
+
+exphappy:
+Overall, on a scale of 1-10, how happy do you expect to be with the people you meet
+during the speed-dating event?
