@@ -80,9 +80,7 @@ SD2NA_train = SD2NA11[-test_ind, ]
 SD2NA_test = SD2NA11[test_ind, ]
 ```
 
-```{r}
-
-```
+``
 
 ```{r}
 library(recommenderlab)
@@ -107,7 +105,28 @@ str(recc_predicted)
 recc_user_1 <- recc_predicted@items[[1]]
 recc_user_1
 ```
+Вводи данные
+```{r}
+m= 1
+n= 25
+c= 7
+SD2NANA <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1)& career_c == c)
+SD2NANA1 <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1))
 
+```
+```{r}
+SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+SD2NANA11 = as.data.frame(lapply(SD2NANA2[,-c(1)], FUN=function(x) abs(x-x[nrow(SD2NANA2)])))
+SD2NANA11$iid = SD2NANA2$iid
+SD2NANA111 = SD2NANA11[-c(nrow(SD2NANA11)),]
+#SD2NANA111 = arrange(SD2NANA111, iid.)
+SD2NANA112 = mutate(SD2NANA111, sum = apply(SD2NANA111[-23], 1, function(x) sum(x[x!=0])))
+```
+
+```{r}
+antitop = head (arrange(SD2NANA112, sum), 10)
+antitop$iid
+```
 
 iid - уникальный номер
 age - возраст
