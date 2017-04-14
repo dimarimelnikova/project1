@@ -73,19 +73,25 @@ SDFdec1 = filter(SDFdec, dec>0) #3515
 
 ```{r}
 set.seed(100)
-test_ind = sample(1:nrow(SD2NA1), size = 5)
-SD2NA_train = SD2NA1[-test_ind, ]
-SD2NA_test = SD2NA1[test_ind, ]
+SD2NA11 <- as(SD2NA1, "realRatingMatrix")
+test_ind = sample(1:nrow(SD2NA11), size = 5)
+SD2NA_train = SD2NA11[-test_ind, ]
+SD2NA_test = SD2NA11[test_ind, ]
 ```
 
-```{r}
-SD2NA_train1 <- as(SD2NA_train, "realRatingMatrix")
-```
 
 ```{r}
 library(recommenderlab)
-recc_model = Recommender(data = SD2NA_train1, method = "IBCF", parameter = list(k = 26))
+recc_model = Recommender(data = SD2NA_train, method = "IBCF", parameter = list(k = 26))
 recc_model
+```
+
+```{r}
+recc_predicted <- predict(object = recc_model, newdata = SD2NA_test, n = 10)
+recc_predicted
+```
+```{r}
+str(recc_predicted)
 ```
 
 iid - уникальный номер
