@@ -62,6 +62,13 @@ SDFlike = na.omit(SDFlike) #8128
 SDFlike$like = as.numeric(SDFlike$like)
 ```
 
+```{r}
+SDFlike7= filter(SDFlike, like>7) #1885
+```
+
+```{r}
+SDFdec1 = filter(SDFdec, dec>0) #3515
+```
 
 iid - уникальный номер
 age - возраст
