@@ -19,6 +19,50 @@ library(dplyr)
 SD1 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1, mn_sat)
 ```
 
+Оставляем уникальных людей
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD1un = unique(SD1)
+SD1NA = na.omit(SD1un) #199
+```
+Предложение - исключить параметр mn_sat из-за малого количества данных
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1)
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2un = unique(SD2)
+SD2NA = na.omit(SD2un)#535
+```
+
+535 уникальных человека в базе
+
+База с расширенными личными характеристиками
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22 = select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, zipcode, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22un = unique(SD22)
+SD22NA = na.omit(SD22un)#466
+```
+
+466 уникальных человека с расширенными характеристиками
+
+Матрица решений dec бинарность
+```{r}
+SDFdec = select (SpeedDating, iid, pid, dec)
+SDFdec = na.omit(SDFdec) #8368
+SDFdec$dec=as.numeric(SDFdec$dec)
+```
+
+Матрица решений like шкала 0-10
+```{r}
+SDFlike = select (SpeedDating, iid, pid, like)
+SDFlike = na.omit(SDFlike) #8128
+SDFlike$like = as.numeric(SDFlike$like)
+```
+
+
 iid - уникальный номер
 age - возраст
 gender - пол
@@ -67,40 +111,6 @@ intel3_1 Intelligent
 fun3_1 Fun
 amb3_1 Ambitious
 
-mn_sat - средний балл SAT
-
-Оставляем уникальных людей
-```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD1un = unique(SD1)
-SD1NA = na.omit(SD1un) #199
-```
-Предложение - исключить параметр mn_sat из-за малого количества данных
-```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1)
-```
-
-```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD2un = unique(SD2)
-SD2NA = na.omit(SD2un)#535
-```
-
-535 уникальных человека в базе
-
-База с расширенными личными характеристиками
-```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD22 = select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, zipcode, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
-```
-
-```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD22un = unique(SD22)
-SD22NA = na.omit(SD22un)#466
-```
-
-466 уникальных человека с расширенными характеристиками
-
-iid
-gender
-age
 field_cd закодированный field of study
 1= Law
 2= Math
