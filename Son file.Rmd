@@ -32,7 +32,8 @@ SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 SD2un = unique(SD2)
 SD2NA = na.omit(SD2un)#535
-SD2NA1 = sapply(SD2NA, as.numeric)
+#SD2NA1 = sapply(SD2NA, as.numeric)
+#SD2NA1 = as.data.frame(SD2NA1)
 ```
 
 535 уникальных человека в базе
@@ -71,49 +72,17 @@ SDFlike7= filter(SDFlike, like>7) #1885
 SDFdec1 = filter(SDFdec, dec>0) #3515
 ```
 
-```{r}
-set.seed(100)
-SD2NA11 <- as(SD2NA1, "realRatingMatrix")
-SD2NA11
-test_ind = sample(1:nrow(SD2NA11), size = 5)
-SD2NA_train = SD2NA11[-test_ind, ]
-SD2NA_test = SD2NA11[test_ind, ]
-```
 
-``
-
-```{r}
-library(recommenderlab)
-recc_model = Recommender(data = SD2NA_train, method = "IBCF", parameter = list(k = 30))
-recc_model
-```
-
-```{r}
-model_details <- getModel(recc_model)
-model_details$description
-model_details$sim[1:5, 1:5]
-```
-
-```{r}
-recc_predicted <- predict(object = recc_model, newdata = SD2NA_test, n = 10)
-recc_predicted
-```
-```{r}
-str(recc_predicted)
-```
-```{r}
-recc_user_1 <- recc_predicted@items[[1]]
-recc_user_1
-```
 Вводи данные
 ```{r}
-m= 1
-n= 25
-c= 7
-SD2NANA <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1)& career_c == c)
-SD2NANA1 <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1))
-
+m= 0
+n= 22
+#c= 2
+#SD2NANA <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1)& career_c == c)
+SD2NANA1 = filter(SD2NA, gender == m , age >= n-3,  age <= n+3)
+#seq(from = n-5, to = n+5, by = 1))
 ```
+
 ```{r}
 SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
 SD2NANA11 = as.data.frame(lapply(SD2NANA2[,-c(1)], FUN=function(x) abs(x-x[nrow(SD2NANA2)])))
@@ -121,11 +90,20 @@ SD2NANA11$iid = SD2NANA2$iid
 SD2NANA111 = SD2NANA11[-c(nrow(SD2NANA11)),]
 #SD2NANA111 = arrange(SD2NANA111, iid.)
 SD2NANA112 = mutate(SD2NANA111, sum = apply(SD2NANA111[-23], 1, function(x) sum(x[x!=0])))
+#SD2NANA113 = left_join(SD2NANA112, SD2NANA1, by = 'iid')
 ```
 
 ```{r}
-antitop = head (arrange(SD2NANA112, sum), 10)
+antitop = head (arrange(SD2NANA112, sum), 20)
 antitop$iid
+```
+```{r}
+SDFlike7_1 = filter(SDFdec, iid == c(198, 302, 529, 437, 197, 213, 88, 201,  34,  35, 133, 256, 430, 324,  65, 142, 144, 180, 183, 323) )
+```
+
+
+```{r}
+#SD22NA1 = filter(SD22NA, iid = antitop$iid )
 ```
 
 iid - уникальный номер
