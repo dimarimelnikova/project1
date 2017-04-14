@@ -74,16 +74,26 @@ SDFdec1 = filter(SDFdec, dec>0) #3515
 ```{r}
 set.seed(100)
 SD2NA11 <- as(SD2NA1, "realRatingMatrix")
+SD2NA11
 test_ind = sample(1:nrow(SD2NA11), size = 5)
 SD2NA_train = SD2NA11[-test_ind, ]
 SD2NA_test = SD2NA11[test_ind, ]
 ```
 
+```{r}
+
+```
 
 ```{r}
 library(recommenderlab)
-recc_model = Recommender(data = SD2NA_train, method = "IBCF", parameter = list(k = 26))
+recc_model = Recommender(data = SD2NA_train, method = "IBCF", parameter = list(k = 30))
 recc_model
+```
+
+```{r}
+model_details <- getModel(recc_model)
+model_details$description
+model_details$sim[1:5, 1:5]
 ```
 
 ```{r}
@@ -93,6 +103,11 @@ recc_predicted
 ```{r}
 str(recc_predicted)
 ```
+```{r}
+recc_user_1 <- recc_predicted@items[[1]]
+recc_user_1
+```
+
 
 iid - уникальный номер
 age - возраст
