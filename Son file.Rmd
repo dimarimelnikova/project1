@@ -32,6 +32,7 @@ SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 SD2un = unique(SD2)
 SD2NA = na.omit(SD2un)#535
+SD2NA1 = sapply(SD2NA, as.numeric)
 ```
 
 535 уникальных человека в базе
@@ -61,13 +62,30 @@ SDFlike = select (SpeedDating, iid, pid, like)
 SDFlike = na.omit(SDFlike) #8128
 SDFlike$like = as.numeric(SDFlike$like)
 ```
-
+Фильтрация матриц выбора партнеров
 ```{r}
 SDFlike7= filter(SDFlike, like>7) #1885
 ```
 
 ```{r}
 SDFdec1 = filter(SDFdec, dec>0) #3515
+```
+
+```{r}
+set.seed(100)
+test_ind = sample(1:nrow(SD2NA1), size = 5)
+SD2NA_train = SD2NA1[-test_ind, ]
+SD2NA_test = SD2NA1[test_ind, ]
+```
+
+```{r}
+SD2NA_train1 <- as(SD2NA_train, "realRatingMatrix")
+```
+
+```{r}
+library(recommenderlab)
+recc_model = Recommender(data = SD2NA_train1, method = "IBCF", parameter = list(k = 26))
+recc_model
 ```
 
 iid - уникальный номер
