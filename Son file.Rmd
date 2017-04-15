@@ -98,12 +98,23 @@ antitop = head (arrange(SD2NANA112, sum), 20)
 antitop$iid
 ```
 ```{r}
-SDFlike7_1 = filter(SDFdec, iid == c(198, 302, 529, 437, 197, 213, 88, 201,  34,  35, 133, 256, 430, 324,  65, 142, 144, 180, 183, 323) )
+SDFlike7_1 = filter(SDFlike7, iid %in% antitop$iid )
+SDFlike7_1$pid
 ```
 
+```{r}
+SDFdec_1 = filter(SDFdec1, iid %in% antitop$iid )
+SDFdec_1$pid
+```
 
 ```{r}
-#SD22NA1 = filter(SD22NA, iid = antitop$iid )
+SD22NAlp = filter(SD22NA, iid %in% SDFlike7_1$pid)
+nrow(SD22NAlp)
+```
+
+```{r}
+SD22NA1dp = filter(SD22NA, iid %in% SDFdec_1$pid)
+nrow(SD22NA1dp)
 ```
 
 iid - уникальный номер
