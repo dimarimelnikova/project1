@@ -40,7 +40,7 @@ SD2NA = na.omit(SD2un)#535
 
 База с расширенными личными характеристиками
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-SD22 = select(SpeedDating, iid, age, field_cd, race, imprace, imprelig, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
+SD22 = select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
 ```
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
@@ -159,7 +159,7 @@ main = SD22NAall1
 ### Дерево решений
 ```{r}
 library(rpart)
-treeall1=rpart(deci~.-deci-iid,main)
+treeall1=rpart(deci~.-deci-iid-gender,main)
 rpart.plot::prp(treeall1)
 ```
 Результаты на обучающей выборке
@@ -181,7 +181,7 @@ rpartPred$iid = test$iid
 ### SVM linear
 ```{r}
 library("e1071")
-svm_model <- svm(deci~.-deci-iid, data=main, kernel="linear")
+svm_model <- svm(deci~.-deci-iid-gender, data=main, kernel="linear")
 summary(svm_model)
 ```
 Результаты на обучающей выборке
@@ -200,7 +200,7 @@ svm.Pred$iid = test$iid
 ### SVM polynomial
 ```{r}
 library("e1071")
-svm_modelpoly <- svm(deci~.-deci-iid, data=main, kernel="polynomial")
+svm_modelpoly <- svm(deci~.-deci-iid-gender, data=main, kernel="polynomial")
 summary(svm_modelpoly)
 ```
 Результаты на обучающей выборке
@@ -219,7 +219,7 @@ svmpoly.Pred$iid = test$iid
 ### Случайный лес
 ```{r message = F, warning=FALSE}
 library(randomForest)
-rfModel <-randomForest(deci~.-deci-iid, data=main)
+rfModel <-randomForest(deci~.-deci-iid-gender, data=main)
 summary(rfModel) 
 ```
 
@@ -235,7 +235,6 @@ rfPred<-predict(rfModel, test, probability=FALSE)
 rfPred = as.data.frame(rfPred)
 rownames(rfPred) = test$iid
 rfPred$iid = test$iid
-summary(rfPred)
 ```
 
 ```{r}
