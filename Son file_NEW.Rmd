@@ -10,7 +10,7 @@ output:
 Загружаем базу
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(readr)
-SpeedDating <- read_csv("~/project1/SpeedDating.csv")
+SpeedDating <- read_csv("~/Sokolov/3RD COURSE/TheProject/SpeedDating.csv")
 ```
 
 Матрица для поиска похожих
@@ -73,7 +73,7 @@ SDFdec1 = filter(SDFdec, dec>0) #3515
 ```
 
 
-Вводи данные
+Вводим данные
 ```{r}
 m= 0
 n= 22
@@ -83,20 +83,42 @@ SD2NANA1 = filter(SD2NA, gender == m , age >= n-3,  age <= n+3)
 #seq(from = n-5, to = n+5, by = 1))
 ```
 
-```{r}
+
 SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+SD2NANA2 <- as.data.frame(SD2NANA2)
 SD2NANA11 = as.data.frame(lapply(SD2NANA2[,-c(1)], FUN=function(x) abs(x-x[nrow(SD2NANA2)])))
-SD2NANA11$iid = SD2NANA2$iid
+SD2NANA11$iid = SD2NANA2$iid # **ЗДЕСЬ НЕВЕРНО ПРИСОЕДИНЯЕТ IID :(  <-----------------------------------!!!**
 SD2NANA111 = SD2NANA11[-c(nrow(SD2NANA11)),]
 #SD2NANA111 = arrange(SD2NANA111, iid.)
 SD2NANA112 = mutate(SD2NANA111, sum = apply(SD2NANA111[-23], 1, function(x) sum(x[x!=0])))
 #SD2NANA113 = left_join(SD2NANA112, SD2NANA1, by = 'iid')
+
+
+
+**Вот норм. решение этой проблемы:**
+```{r}
+SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+SD2NANA2 <- as.data.frame(SD2NANA2)
+rownames(SD2NANA2) = SD2NANA2$iid # дублирую iid в порядковый столбец (который не используется при расчетах)
+SD2NANA2_0 = select(SD2NANA2, -iid) 
+new <- tail(SD2NANA2_0, n=1) # достаю одну последнюю строчку
+new <- as.matrix(new)
+big <- as.matrix(SD2NANA2_0) %>%
+  t() # транспонирую матрицу big
+new <-t(new)[,1] #  транспонирую матрицу new --> получаю из строчки вектор
+new1 <-as.data.frame(new)
+big <-t(abs(big-new))
+big <- as.data.frame(big)
+big$sum<-rowSums(big)
+big$iid = SD2NANA2$iid
 ```
 
 ```{r}
-antitop = head (arrange(SD2NANA112, sum), 20)
+antitop = head (arrange(big, sum), 10)
 antitop$iid
 ```
+
+
 ```{r}
 SDFlike7_1 = filter(SDFlike7, iid %in% antitop$iid )
 SDFlike7_1$pid
