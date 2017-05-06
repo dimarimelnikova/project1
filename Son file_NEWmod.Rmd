@@ -75,7 +75,7 @@ SDFdec1 = filter(SDFdec, dec>0) #3515
 
 Вводим данные
 ```{r}
-m= 0
+m= 1
 n= 22
 #c= 2
 #SD2NANA <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1)& career_c == c)
@@ -152,7 +152,11 @@ SD22NAall1 = mutate(SD22NAall, deci = ifelse(iid %in% SDFdec_1$pid, 1, 0))
 SD22NAall1$deci= as.factor(SD22NAall1$deci)
 #SD22NAoutall = mutate(SD22NA, est = ifelse(iid %in% SDFdec_all$pid, 1, 0))
 #SD22NAoutall1 = filter(SD22NAoutall, est==0)
-test = SD22NA
+test = if (m==0) {
+   filter(SD22NA,gender == 1)
+} else {
+   filter(SD22NA, gender == 0)
+}
 main = SD22NAall1
 ```
 
