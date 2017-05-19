@@ -113,7 +113,7 @@ server <- function(input, output) {
         SD22NAlp = filter(SD22NA, iid %in% SDFlike7_1$pid)
         
         SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
-        if()
+        #if()
         SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
         SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
         
