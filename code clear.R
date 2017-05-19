@@ -36,7 +36,7 @@ SD2NANA2_0 = select(SD2NANA2, -iid)
 new <- tail(SD2NANA2_0, n=1) 
 new <- as.matrix(new)
 big <- as.matrix(SD2NANA2_0)
-  t() 
+big = t(big) 
 new <-t(new)[,1] 
 new1 <-as.data.frame(new)
 big <-t(abs(big-new))
