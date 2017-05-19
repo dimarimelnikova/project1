@@ -38,15 +38,20 @@ ui <- fluidPage(
              ),
   
   tabPanel("Рекомендованные",
-           
-           selectInput(inputId = "char1", label = "Фильтр 1", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
+           sidebarLayout(
+             sidebarPanel(
+          
+             selectInput(inputId = "char1", label = "Фильтр 1", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
            sliderInput(inputId = "char1_range", label = "Ограничения для фильтра 1" , min= 1, max =10, value = c(4,6) ),
            selectInput(inputId = "char2", label = "Фильтр 2", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
            sliderInput(inputId = "char2_range", label = "Ограничения для фильтра 2" , min= 1, max =10, value = c(4,6) ),
            selectInput(inputId = "char3", label = "Фильтр 3", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
-           sliderInput(inputId = "char3_range", label = "Ограничения для фильтра 3" , min= 1, max =10, value = c(4,6) ),
-           
-           tableOutput(outputId = "table")
+           sliderInput(inputId = "char3_range", label = "Ограничения для фильтра 3" , min= 1, max =10, value = c(4,6) )
+             ),
+           mainPanel(
+             tableOutput(outputId = "table")
+           )
+           )
            )
   )
 )
@@ -78,51 +83,90 @@ server <- function(input, output) {
             shopping = input$shopping,
             yoga = input$yoga
           ))
-              
-        SpeedDating <- read_csv("SpeedDating.csv")
-        SD2 <- select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1)
-        SD2NA <- na.omit(unique(SD2))
-        SD22 <- select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, zipcode, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
-        SD22NA <- na.omit(unique(SD22))
-        # решение людей и их лайки
-        SDFdec = select(SpeedDating, iid, pid, dec)
-        SDFdec = na.omit(SDFdec)
-        SDFdec$dec=as.numeric(SDFdec$dec)
-        SDFlike = select (SpeedDating, iid, pid, like)
-        SDFlike = na.omit(SDFlike)
-        SDFlike$like = as.numeric(SDFlike$like)
-        # фильтр положительных решений
-        SDFdec1 = filter(SDFdec, dec>0)
-        SDFlike7= filter(SDFlike, like>7)
-        SD2NANA2 = SD2NA %>% filter(gender == m , age >= n-3,  age <= n+3) %>% select( -age, -gender, -career_c)
-        SD2NANA2 <- as.data.frame(SD2NANA2)
-        rownames(SD2NANA2) = SD2NANA2$iid
-        SD2NANA2_0 = select(SD2NANA2, -iid)
-        big <- as.matrix(SD2NANA2_0)
         new <-t(new)[,1]
-        big <- abs(big-new)
+        
+        # обработка данных
+        
+        library(readr)
+        library(dplyr)
+        load("dataframes.RData")
+        SD2NANA1 = filter(SD2NA, gender == m , age >= n-3,  age <= n+3)
+        SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+        SD2NANA2 <- as.data.frame(SD2NANA2)
+        rownames(SD2NANA2) = SD2NANA2$iid # дублирую iid в порядковый столбец (который не используется при расчетах)
+        SD2NANA2_0 = select(SD2NANA2, -iid) 
+        big <- as.matrix(SD2NANA2_0) %>% t() # транспонирую матрицу big
+        big <-t(abs(big-new))
         big <- as.data.frame(big)
         big$sum<-rowSums(big)
-        big$iid <- SD2NANA2$iid
-        antitop <- head(arrange(big, sum), 10)
-        people_like_me <- antitop$iid
-        # кто понравился таким же как я 
-        SDFlike7_1 = filter(SDFlike7, iid %in% people_like_me )
-        SDFdec_1 = filter(SDFdec1, iid %in% people_like_me )
-        # кандинаты по like
-        SD22NAlp = filter(SD22NA, iid %in% SDFlike7_1$pid)
+        big$iid = SD2NANA2$iid
+        antitop = head (arrange(big, sum), 10)
+        SDFdec_all = filter(SDFdec, iid %in% antitop$iid )
+        SDFdec_1 = filter(SDFdec1, iid %in% antitop$iid )
+        SD22NA1dp = filter(SD22NA, iid %in% SDFdec_1$pid)
+        SD22NAall = filter(SD22NA, iid %in% SDFdec_all$pid)
+        SD22NAall1 = mutate(SD22NAall, deci = ifelse(iid %in% SDFdec_1$pid, 1, 0))
+        SD22NAall1$deci= as.factor(SD22NAall1$deci)
+        # предсказание значений
+        test = if (m==0) {
+          filter(SD22NA,gender == 1)
+        } else {
+          filter(SD22NA, gender == 0)
+        }
+        main = SD22NAall1
+        library(rpart)
+        treeall1=rpart(deci~.-deci-iid-gender,main)
+        library(caret)
+        rpartPred <- predict(treeall1, main, type = "class")
+        rpartPred <- predict(treeall1, test, type = "class")
+        rpartPred = as.data.frame(rpartPred)
+        rownames(rpartPred) = test$iid
+        rpartPred$iid = test$iid
+        library("e1071")
+        svm_model <- svm(deci~.-deci-iid-gender, data=main, kernel="linear")
+        svm.Pred<-predict(svm_model, main, probability=FALSE)
+        svm.Pred<-predict(svm_model, test, probability=FALSE)
+        svm.Pred = as.data.frame(svm.Pred)
+        rownames(svm.Pred) = test$iid
+        svm.Pred$iid = test$iid
+        library("e1071")
+        svm_modelpoly <- svm(deci~.-deci-iid-gender, data=main, kernel="polynomial")
+        svmpoly.Pred<-predict(svm_modelpoly, main, probability=FALSE)
+        svmpoly.Pred<-predict(svm_modelpoly, test, probability=FALSE)
+        svmpoly.Pred = as.data.frame(svmpoly.Pred)
+        rownames(svmpoly.Pred) = test$iid
+        svmpoly.Pred$iid = test$iid
+        library(randomForest)
+        rfModel <-randomForest(deci~.-deci-iid-gender, data=main)
+        rfPred<-predict(rfModel, main, probability=FALSE)
+        rfPred<-predict(rfModel, test, probability=FALSE)
+        rfPred = as.data.frame(rfPred)
+        rownames(rfPred) = test$iid
+        rfPred$iid = test$iid
+        predictall = inner_join(rpartPred,svm.Pred, by = "iid")
+        predictall = inner_join(predictall,svmpoly.Pred, by = "iid")
+        predictall = inner_join(predictall,rfPred, by = "iid")
+        predictall = predictall[c(2,1,3,4,5)]
+        predictall$rpartPred = as.numeric(predictall$rpartPred)
+        predictall$svm.Pred = as.numeric(predictall$svm.Pred)
+        predictall$svmpoly.Pred = as.numeric(predictall$svmpoly.Pred)
+        predictall$rfPred = as.numeric(predictall$rfPred)
+        pred = c("rpartPred", "svm.Pred", "svmpoly.Pred", "rfPred")
+        predictall1 = mutate(predictall, mean = rowMeans(predictall[pred]))
+        predictall2 = filter(predictall1, mean==2)
+        done = filter(SD22NA, iid %in% predictall2$iid)
         
-        SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
-        #if()
-        SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
-        SD22NAlp <- filter(SD22NAlp, SD22NAlp[input$char1] > input$char1_range[1] & SD22NAlp[input$char1] < input$char1_range[2])
-        
-        SD22NAlp <- arrange()
-        
-        SD22NAlp
-        
-        
-        
+        # фильтрация значений по предпочитаемым характеристикам
+        if (input$char1 != "none"){
+          done <- filter(done, done[input$char1] >= input$char1_range[1] & done[input$char1] <= input$char1_range[2])
+          if(input$char2 != "none" & nrow(done) >= 0){
+            done <- filter(done, done[input$char2] > input$char2_range[1] & done[input$char2] <= input$char2_range[2])
+            if(input$char3 != "none" & nrow(done) >= 0){
+              done <- filter(done, done[input$char3] > input$char3_range[1] & done[input$char3] <= input$char3_range[2])
+            }
+          }  
+        }
+        done
     })
 }
 
