@@ -1,3 +1,4 @@
+
 library(readr)
 library(dplyr)
 load("dataframes.RData")
@@ -5,7 +6,7 @@ load("dataframes.RData")
 m= 1
 n= 22
 SD2NANA1 = filter(SD2NA, gender == m , age >= n-3,  age <= n+3)
-SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+оSD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
 SD2NANA2 <- as.data.frame(SD2NANA2)
 rownames(SD2NANA2) = SD2NANA2$iid # дублирую iid в порядковый столбец (который не используется при расчетах)
 SD2NANA2_0 = select(SD2NANA2, -iid) 
@@ -34,6 +35,8 @@ test = if (m==0) {
   filter(SD22NA, gender == 0)
 }
 main = SD22NAall1
+# Построим модели для предсказания (необходимо, чтобы все модели показали "2".
+# Дерево решений
 library(rpart)
 treeall1=rpart(deci~.-deci-iid-gender,main)
 library(caret)
@@ -42,6 +45,7 @@ rpartPred <- predict(treeall1, test, type = "class")
 rpartPred = as.data.frame(rpartPred)
 rownames(rpartPred) = test$iid
 rpartPred$iid = test$iid
+#SVM linear
 library("e1071")
 svm_model <- svm(deci~.-deci-iid-gender, data=main, kernel="linear")
 svm.Pred<-predict(svm_model, main, probability=FALSE)
@@ -49,6 +53,7 @@ svm.Pred<-predict(svm_model, test, probability=FALSE)
 svm.Pred = as.data.frame(svm.Pred)
 rownames(svm.Pred) = test$iid
 svm.Pred$iid = test$iid
+#SVM polynominal
 library("e1071")
 svm_modelpoly <- svm(deci~.-deci-iid-gender, data=main, kernel="polynomial")
 svmpoly.Pred<-predict(svm_modelpoly, main, probability=FALSE)
@@ -56,6 +61,7 @@ svmpoly.Pred<-predict(svm_modelpoly, test, probability=FALSE)
 svmpoly.Pred = as.data.frame(svmpoly.Pred)
 rownames(svmpoly.Pred) = test$iid
 svmpoly.Pred$iid = test$iid
+# Случайный лес
 library(randomForest)
 rfModel <-randomForest(deci~.-deci-iid-gender, data=main)
 rfPred<-predict(rfModel, main, probability=FALSE)
