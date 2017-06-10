@@ -19,33 +19,33 @@ ui <- fluidPage(
              titlePanel("Как вы относитесь к указаным видам деятельности. Оцените по шкале от 1 до 10."),
              
              sliderInput("sports", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("tvsports", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("excersice", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("dining", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("museums", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("art", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("hiking", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("gaming", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("clubbing", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("reading", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("tv", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("theater", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("movies", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("concerts", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("music", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("shopping", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
-             sliderInput("yoga", "Ваше отношение к спорту:" , min= 1, max =10, value = 5)
+             sliderInput("tvsports", "Ваше отношение к просмотру спортивных событий по ТВ:" , min= 1, max =10, value = 5),
+             sliderInput("exercise", "Ваше отношение к физическим упражнениям:" , min= 1, max =10, value = 5),
+             sliderInput("dining", "Ваше отношение к ужину вне дома:" , min= 1, max =10, value = 5),
+             sliderInput("museums", "Ваше отношение к музеям:" , min= 1, max =10, value = 5),
+             sliderInput("art", "Ваше отношение к искусству:" , min= 1, max =10, value = 5),
+             sliderInput("hiking", "Ваше отношение к пешиму туризму/альпинизму:" , min= 1, max =10, value = 5),
+             sliderInput("gaming", "Ваше отношение к компьютерным играм:" , min= 1, max =10, value = 5),
+             sliderInput("clubbing", "Ваше отношение к посещению ночных клубов:" , min= 1, max =10, value = 5),
+             sliderInput("reading", "Ваше отношение к чтению книг:" , min= 1, max =10, value = 5),
+             sliderInput("tv", "Ваше отношение к просмотру телевизора:" , min= 1, max =10, value = 5),
+             sliderInput("theater", "Ваше отношение к театру:" , min= 1, max =10, value = 5),
+             sliderInput("movies", "Ваше отношение к кинотеатру:" , min= 1, max =10, value = 5),
+             sliderInput("concerts", "Ваше отношение к концертам:" , min= 1, max =10, value = 5),
+             sliderInput("music", "Ваше отношение к музыке:" , min= 1, max =10, value = 5),
+             sliderInput("shopping", "Ваше отношение к шопингу:" , min= 1, max =10, value = 5),
+             sliderInput("yoga", "Ваше отношение к йоге:" , min= 1, max =10, value = 5)
              ),
   
   tabPanel("Рекомендованные",
            sidebarLayout(
              sidebarPanel(
           
-             selectInput(inputId = "char1", label = "Фильтр 1", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
+             selectInput(inputId = "char1", label = "Фильтр 1", choices = c("none","sports","tvsports","exercise","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
            sliderInput(inputId = "char1_range", label = "Ограничения для фильтра 1" , min= 1, max =10, value = c(4,6) ),
-           selectInput(inputId = "char2", label = "Фильтр 2", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
+           selectInput(inputId = "char2", label = "Фильтр 2", choices = c("none","sports","tvsports","exercise","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
            sliderInput(inputId = "char2_range", label = "Ограничения для фильтра 2" , min= 1, max =10, value = c(4,6) ),
-           selectInput(inputId = "char3", label = "Фильтр 3", choices = c("none","sports","tvsports","excersice","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
+           selectInput(inputId = "char3", label = "Фильтр 3", choices = c("none","sports","tvsports","exercise","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga")),
            sliderInput(inputId = "char3_range", label = "Ограничения для фильтра 3" , min= 1, max =10, value = c(4,6) )
              ),
            mainPanel(
@@ -67,7 +67,7 @@ server <- function(input, output) {
         new <- as.matrix(data.frame(
             sports = input$sports,
             tvsports = input$tvsports,
-            excersice = input$excersice,
+            exercise = input$exercise,
             dining = input$dining,
             museums = input$museums,
             art = input$art,
