@@ -1,0 +1,429 @@
+---
+title: "Матрицы"
+author: "Sofi Tormasheva"
+date: "04 03 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+Загружаем базу
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(readr)
+SpeedDating <- read_csv("~/pr3/project1/SpeedDating.csv")
+```
+
+Матрица для поиска похожих
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(dplyr)
+SD1 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1, mn_sat)
+```
+
+Оставляем уникальных людей
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD1un = unique(SD1)
+SD1NA = na.omit(SD1un) #199
+```
+Предложение - исключить параметр mn_sat из-за малого количества данных
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2 = select(SpeedDating, iid, age, gender, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1)
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD2un = unique(SD2)
+SD2NA = na.omit(SD2un)#535
+#SD2NA1 = sapply(SD2NA, as.numeric)
+#SD2NA1 = as.data.frame(SD2NA1)
+```
+
+535 уникальных человека в базе
+
+База с расширенными личными характеристиками
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22 = select(SpeedDating, iid, gender, age, field_cd, race, imprace, imprelig, goal, date, go_out, career_c, sports, tvsports, exercise, dining, museums, art, hiking, gaming, clubbing, reading, tv, theater, movies, concerts, music, shopping, yoga, exphappy, attr3_1, sinc3_1, intel3_1, fun3_1, amb3_1 )
+```
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+SD22un = unique(SD22)
+SD22NA = na.omit(SD22un)#466
+```
+
+466 уникальных человека с расширенными характеристиками
+
+Матрица решений dec бинарность
+```{r}
+SDFdec = select (SpeedDating, iid, pid, dec)
+SDFdec = na.omit(SDFdec) #8368
+SDFdec$dec=as.numeric(SDFdec$dec)
+```
+
+Матрица решений like шкала 0-10
+```{r}
+SDFlike = select (SpeedDating, iid, pid, like)
+SDFlike = na.omit(SDFlike) #8128
+SDFlike$like = as.numeric(SDFlike$like)
+```
+Фильтрация матриц выбора партнеров
+```{r}
+SDFlike7= filter(SDFlike, like>7) #1885
+```
+
+```{r}
+SDFdec1 = filter(SDFdec, dec>0) #3515
+```
+
+
+Вводим данные
+```{r}
+m= 1
+n= 22
+#c= 2
+#SD2NANA <- filter(SD2NA, gender == m & age == seq(from = n-5, to = n+5, by = 1)& career_c == c)
+SD2NANA1 = filter(SD2NA, gender == m , age >= n-3,  age <= n+3)
+#seq(from = n-5, to = n+5, by = 1))
+```
+
+
+SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+SD2NANA2 <- as.data.frame(SD2NANA2)
+SD2NANA11 = as.data.frame(lapply(SD2NANA2[,-c(1)], FUN=function(x) abs(x-x[nrow(SD2NANA2)])))
+SD2NANA11$iid = SD2NANA2$iid # **ЗДЕСЬ НЕВЕРНО ПРИСОЕДИНЯЕТ IID :(  <-----------------------------------!!!**
+SD2NANA111 = SD2NANA11[-c(nrow(SD2NANA11)),]
+#SD2NANA111 = arrange(SD2NANA111, iid.)
+SD2NANA112 = mutate(SD2NANA111, sum = apply(SD2NANA111[-23], 1, function(x) sum(x[x!=0])))
+#SD2NANA113 = left_join(SD2NANA112, SD2NANA1, by = 'iid')
+
+
+
+**Вот норм. решение этой проблемы:**
+```{r}
+SD2NANA2 = select(SD2NANA1, -age, -gender, -career_c)
+SD2NANA2 <- as.data.frame(SD2NANA2)
+rownames(SD2NANA2) = SD2NANA2$iid # дублирую iid в порядковый столбец (который не используется при расчетах)
+SD2NANA2_0 = select(SD2NANA2, -iid) 
+new <- tail(SD2NANA2_0, n=1) # достаю одну последнюю строчку
+new <- as.matrix(new)
+big <- as.matrix(SD2NANA2_0) %>%
+  t() # транспонирую матрицу big
+new <-t(new)[,1] #  транспонирую матрицу new --> получаю из строчки вектор
+new1 <-as.data.frame(new)
+big <-t(abs(big-new))
+big <- as.data.frame(big)
+big$sum<-rowSums(big)
+big$iid = SD2NANA2$iid
+```
+
+```{r}
+antitop = head (arrange(big, sum), 10)
+antitop$iid
+```
+
+
+```{r}
+#SDFlike7_1 = filter(SDFlike7, iid %in% antitop$iid )
+#SDFlike7_1$pid
+```
+
+```{r}
+SDFdec_all = filter(SDFdec, iid %in% antitop$iid )
+nrow(SDFdec_all)
+SDFdec_all$pid
+```
+
+
+```{r}
+SDFdec_1 = filter(SDFdec1, iid %in% antitop$iid )
+SDFdec_1$pid
+```
+
+```{r}
+#SD22NAlp = filter(SD22NA, iid %in% SDFlike7_1$pid)
+#nrow(SD22NAlp)
+```
+
+```{r}
+SD22NA1dp = filter(SD22NA, iid %in% SDFdec_1$pid)
+nrow(SD22NA1dp)
+```
+
+```{r}
+SD22NAall = filter(SD22NA, iid %in% SDFdec_all$pid)
+SD22NAall1 = mutate(SD22NAall, deci = ifelse(iid %in% SDFdec_1$pid, 1, 0))
+SD22NAall1$deci= as.factor(SD22NAall1$deci)
+#SD22NAoutall = mutate(SD22NA, est = ifelse(iid %in% SDFdec_all$pid, 1, 0))
+#SD22NAoutall1 = filter(SD22NAoutall, est==0)
+test = if (m==0) {
+   filter(SD22NA,gender == 1)
+} else {
+   filter(SD22NA, gender == 0)
+}
+main = SD22NAall1
+```
+
+### Дерево решений
+```{r}
+library(rpart)
+treeall1=rpart(deci~.-deci-iid-gender,main)
+rpart.plot::prp(treeall1)
+```
+Результаты на обучающей выборке
+```{r}
+library(caret)
+rpartPred <- predict(treeall1, main, type = "class")
+confusionMatrix(rpartPred,main$deci)
+```
+
+Результаты на тестовой выборке
+
+```{r}
+rpartPred <- predict(treeall1, test, type = "class")
+rpartPred = as.data.frame(rpartPred)
+rownames(rpartPred) = test$iid
+rpartPred$iid = test$iid
+```
+
+### SVM linear
+```{r}
+library("e1071")
+svm_model <- svm(deci~.-deci-iid-gender, data=main, kernel="linear")
+summary(svm_model)
+```
+Результаты на обучающей выборке
+```{r}
+svm.Pred<-predict(svm_model, main, probability=FALSE)
+confusionMatrix(svm.Pred,main$deci)
+```
+Результаты на тестовой выборке
+```{r}
+svm.Pred<-predict(svm_model, test, probability=FALSE)
+svm.Pred = as.data.frame(svm.Pred)
+rownames(svm.Pred) = test$iid
+svm.Pred$iid = test$iid
+```
+
+### SVM polynomial
+```{r}
+library("e1071")
+svm_modelpoly <- svm(deci~.-deci-iid-gender, data=main, kernel="polynomial")
+summary(svm_modelpoly)
+```
+Результаты на обучающей выборке
+```{r}
+svmpoly.Pred<-predict(svm_modelpoly, main, probability=FALSE)
+confusionMatrix(svmpoly.Pred,main$deci)
+```
+Результаты на тестовой выборке
+```{r}
+svmpoly.Pred<-predict(svm_modelpoly, test, probability=FALSE)
+svmpoly.Pred = as.data.frame(svmpoly.Pred)
+rownames(svmpoly.Pred) = test$iid
+svmpoly.Pred$iid = test$iid
+```
+
+### Случайный лес
+```{r message = F, warning=FALSE}
+library(randomForest)
+rfModel <-randomForest(deci~.-deci-iid-gender, data=main)
+summary(rfModel) 
+```
+
+Результаты на обучающей выборке
+```{r}
+rfPred<-predict(rfModel, main, probability=FALSE)
+confusionMatrix(rfPred,main$deci)
+```
+
+Результаты на тестовой выборке
+```{r}
+rfPred<-predict(rfModel, test, probability=FALSE)
+rfPred = as.data.frame(rfPred)
+rownames(rfPred) = test$iid
+rfPred$iid = test$iid
+```
+
+```{r}
+predictall = inner_join(rpartPred,svm.Pred, by = "iid")
+predictall = inner_join(predictall,svmpoly.Pred, by = "iid")
+predictall = inner_join(predictall,rfPred, by = "iid")
+predictall = predictall[c(2,1,3,4,5)]
+```
+
+```{r}
+predictall$rpartPred = as.numeric(predictall$rpartPred)
+predictall$svm.Pred = as.numeric(predictall$svm.Pred)
+predictall$svmpoly.Pred = as.numeric(predictall$svmpoly.Pred)
+predictall$rfPred = as.numeric(predictall$rfPred)
+```
+
+```{r}
+pred = c("rpartPred", "svm.Pred", "svmpoly.Pred", "rfPred")
+predictall1 = mutate(predictall, mean = rowMeans(predictall[pred]))
+#predictall2 = head (arrange(predictall1, -mean), 25)
+predictall2 = filter(predictall1, mean==2)
+```
+
+```{r}
+done = filter(SD22NA, iid %in% predictall2$iid)
+```
+
+```{r}
+vari = apply(done, 2, FUN = var)
+done1 = rbind(done, apply(done, 2, FUN = var))
+done2 = done1[nrow(done1),]
+done3 = done2[,-c(1,2)]
+done3 = as.data.frame(t(done3))
+done3 = mutate(done3, name = rownames(done3))
+done4 = arrange(done3, V1)
+```
+
+```{r}
+ggplot() +
+  geom_point(data = done4, aes(x = name, y = V1), size = 1)
+```
+
+
+```{r}
+stable = head(done4$name,5)
+```
+
+```{r}
+done5 = done[, names(done) %in% stable]
+apply(done5, 2, FUN = median)
+```
+
+iid - уникальный номер
+age - возраст
+gender - пол
+career_c - закодированная карьерная область
+1= Lawyer
+2= Academic/Research
+3= Psychologist
+4= Doctor/Medicine
+5=Engineer
+6= Creative Arts/Entertainment
+7= Banking/Consulting/Finance/Marketing/Business/CEO/Entrepreneur/Admin
+8= Real Estate
+9= International/Humanitarian Affairs
+10= Undecided
+11=Social Work
+12=Speech Pathology
+13=Politics
+14=Pro sports/Athletics
+15=Other
+16=Journalism
+17=Architecture
+
+Интересы:
+sports: Playing sports/ athletics
+tvsports: Watching sports
+exercise: Body building/exercising
+dining: Dining out
+museums: Museums/galleries
+art: Art
+hiking: Hiking/camping
+gaming: Gaming
+clubbing: Dancing/clubbing
+reading: Reading
+tv: Watching TV
+theater: Theater
+movies: Movies
+concerts: Going to concerts
+music: Music
+shopping: Shopping
+yoga: Yoga/meditation
+
+Личные характеристики:
+attr3_1 Attractive
+sinc3_1 Sincere
+intel3_1 Intelligent
+fun3_1 Fun
+amb3_1 Ambitious
+
+field_cd закодированный field of study
+1= Law
+2= Math
+3= Social Science, Psychologist
+4= Medical Science, Pharmaceuticals, and Bio Tech
+5= Engineering
+6= English/Creative Writing/ Journalism
+7= History/Religion/Philosophy
+8= Business/Econ/Finance
+9= Education, Academia
+10= Biological Sciences/Chemistry/Physics
+11= Social Work
+12= Undergrad/undecided
+13=Political Science/International Affairs
+14=Film
+15=Fine Arts/Arts Administration
+16=Languages
+17=Architecture
+18=Other
+
+race
+Black/African American=1
+European/Caucasian-American=2
+Latino/Hispanic American=3
+Asian/Pacific Islander/Asian-American=4
+Native American=5
+Other=6
+
+imprace:
+How important is it to you (on a scale of 1-10) that a person you date be of the same
+racial/ethnic background?
+imprelig:
+How important is it to you (on a scale of 1-10) that a person you date be of the same
+religious background?
+zipcode:
+What was the zip code of the area where you grew up?
+
+goal:
+What is your primary goal in participating in this event?
+Seemed like a fun night out=1
+To meet new people=2
+To get a date=3
+Looking for a serious relationship=4
+To say I did it=5
+Other=6
+
+date:
+In general, how frequently do you go on dates?
+Several times a week=1
+Twice a week=2
+Once a week=3
+Twice a month=4
+Once a month=5
+Several times a year=6
+Almost never=7
+
+go out:
+How often do you go out (not necessarily on dates)?
+Several times a week=1
+Twice a week=2
+Once a week=3
+Twice a month=4
+Once a month=5
+Several times a year=6
+Almost never=7
+
+career_c: career coded
+1= Lawyer
+2= Academic/Research
+3= Psychologist
+4= Doctor/Medicine
+5=Engineer
+6= Creative Arts/Entertainment
+7= Banking/Consulting/Finance/Marketing/Business/CEO/Entrepreneur/Admin
+8= Real Estate
+9= International/Humanitarian Affairs
+10= Undecided
+11=Social Work
+12=Speech Pathology
+13=Politics
+14=Pro sports/Athletics
+15=Other
+16=Journalism
+17=Architecture
+
+exphappy:
+Overall, on a scale of 1-10, how happy do you expect to be with the people you meet
+during the speed-dating event?
