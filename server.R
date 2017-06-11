@@ -166,8 +166,19 @@ server <- function(input, output) {
             }
           }  
         }
-        done
+        vari = apply(done, 2, FUN = var)
+        done1 = rbind(done, apply(done, 2, FUN = var))
+        done2 = done1[nrow(done1),]
+        done3 = done2[,-c(1,2)]
+        done3 = as.data.frame(t(done3))
+        done3 = mutate(done3, name = rownames(done3))
+        done4 = arrange(done3, V1)
+        stable = head(done4$name,10) # если закончить на этом моменте, то только набор харакетиристик
+        done5 = done[, names(done) %in% stable] # если закончить на этом моменте, то набор харакетиристик и показатель
+        done6 = rbind(done5, apply(done5, 2, FUN = median))
+       
     })
+    
 }
 
 # Run the application 
