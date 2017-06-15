@@ -17,7 +17,7 @@ ui <- fluidPage(
                           c("Male" = 1,"Female" = 0)),
              
              titlePanel("Как вы относитесь к указаным видам деятельности. Оцените по шкале от 1 до 10."),
-             
+             tags$h3("1- абсолютно не важно, 10 - очень важно"),
              sliderInput("sports", "Ваше отношение к спорту:" , min= 1, max =10, value = 5),
              sliderInput("tvsports", "Ваше отношение к просмотру спортивных событий по ТВ:" , min= 1, max =10, value = 5),
              sliderInput("exercise", "Ваше отношение к физическим упражнениям:" , min= 1, max =10, value = 5),
@@ -176,7 +176,7 @@ server <- function(input, output) {
         stable = head(done4$name,10) # если закончить на этом моменте, то только набор харакетиристик
         done5 = done[, names(done) %in% stable] # если закончить на этом моменте, то набор харакетиристик и показатель
         done6 = rbind(done5, apply(done5, 2, FUN = median))
-       
+       done6
     })
     
 }
