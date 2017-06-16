@@ -164,6 +164,7 @@ server <- function(input, output) {
         if(input$char3 != "none" & nrow(done) >= 0){
           done <- filter(done, done[input$char3] > input$char3_range[1] & done[input$char3] <= input$char3_range[2])
         }
+<<<<<<< HEAD
       }  
     }
     vari = apply(done, 2, FUN = var)
@@ -177,6 +178,21 @@ server <- function(input, output) {
     done5 = done[, names(done) %in% stable] # если закончить на этом моменте, то набор харакетиристик и показатель
     #done6 = rbind(done5, apply(done5, 2, FUN = median)) # вывод среднего по тому, что есть. Не нравится результат
     #done6
+=======
+        vari = apply(done, 2, FUN = var)
+        done1 = rbind(done, apply(done, 2, FUN = var))
+        done2 = done1[nrow(done1),]
+        done3 = done2[,-c(1,2)]
+        done3 = as.data.frame(t(done3))
+        done3 = mutate(done3, name = rownames(done3))
+        done4 = arrange(done3, V1)
+        stable = head(done4$name,10) # если закончить на этом моменте, то только набор харакетиристик
+        done5 = done[, names(done) %in% stable] # если закончить на этом моменте, то набор харакетиристик и показатель
+        done6 = rbind(done5, apply(done5, 2, FUN = median))
+       done6
+       
+    })
+>>>>>>> 7a94bde7629ab29548d10f9cf976ba1d17324673
     
   })
   
