@@ -177,6 +177,7 @@ server <- function(input, output) {
         done5 = done[, names(done) %in% stable] # если закончить на этом моменте, то набор харакетиристик и показатель
         done6 = rbind(done5, apply(done5, 2, FUN = median))
        done6
+       
     })
     
 }
