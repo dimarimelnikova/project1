@@ -10,7 +10,7 @@ output:
 Загружаем базу
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(readr)
-SpeedDating <- read_csv("~/pr3/project1/SpeedDating.csv")
+SpeedDating <- read_csv("~/project1/SpeedDating.csv")
 ```
 
 Матрица для поиска похожих
